@@ -8,6 +8,11 @@ pub struct Config{
     pub file : String,
     pub case_insenstive : bool
 }
+#[derive(Debug)]
+pub struct Line<'a>{
+    line : Vec<&'a str>,
+    index : Vec<usize>,
+}
 
 impl Config{
     pub fn new(args : &[String]) -> Result<Config , &'static str>{
@@ -22,37 +27,53 @@ impl Config{
     }
 }
 
-pub fn search<'a>(query : &str, content : & 'a str)->Vec<&'a str>{
+pub fn search<'a>(query : &str, content : & 'a str)->Line<'a>{
     let mut result = Vec::new();
+    let mut index : Vec<usize> = Vec::new();
     for line in content.lines() {
         if line.contains(&query){
+            match line.find(&query){
+                None => (),
+                Some(i) => index.push(i),
+            }
             result.push(line);
         }
     }
-    result
+    Line{line : result, index : index}
 }
-pub fn search_case_insentive<'a>(query : &str, content : & 'a str)->Vec<&'a str>{
+pub fn search_case_insentive<'a>(query : &str, content : & 'a str)->Line<'a>{
     let query = query.to_lowercase();
     let mut result = Vec::new();
+    let mut index : Vec<usize> = Vec::new();
     for line in content.lines(){
         if line.to_lowercase().contains(&query){
+            match line.to_lowercase().find(&query){
+                None => (),
+                Some(i) => index.push(i),
+            }
             result.push(line);
         }
     }
-    result
+    Line{line : result , index : index}
 }
 
 pub fn run(config : Config)->Result<(), Box<dyn Error>>{
     let contents = fs::read_to_string(config.file)?;
-    let result = if config.case_insenstive{
+    let  lines = if config.case_insenstive{
         search_case_insentive(&config.query, &contents)
     }
     else{
         search(&config.query, &contents)
     };
-    for line in result {
-        println!("{}",  line);
-    }
+    for index in (0..lines.line.len()) {
+        let line = lines.line[index];
+        let idx = &lines.index[index];
+        let length : usize = config.query.len();
+        let front = &line[..*idx];
+        let bold = &line[*idx..(length+*idx)].red().bold();
+        let end = &line[(*idx+length)..];
+        println!("{}{}{}", front, bold, end);
+}
     Ok(())
 }
 
