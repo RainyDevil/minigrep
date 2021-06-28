@@ -1,0 +1,8 @@
+Fetches the environment variable key from the current process.
+Errors
+Errors if the environment variable is not present. Errors if the 
+environment variable is not valid Unicode. If this is not desired, consider using var_os.
+Panics
+This function may panic if key is empty, contains an ASCII equals sign '=' or the NUL character '\0', 
+or when the value contains the NUL character.
+Examples
