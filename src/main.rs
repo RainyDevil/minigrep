@@ -9,7 +9,7 @@ fn main() {
         eprintln!("Parase failed : {}", err);
         process::exit(1);
     }); 
-    println!("{:?}", config);
+   // println!("{:?}", config);
     if let Err(err) = run(config){
         eprintln!("{}", err);
     }
