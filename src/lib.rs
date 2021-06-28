@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fs;
 use std::env;
+use colored::*;
 #[derive(Debug)]
 pub struct Config{
     pub query : String,
