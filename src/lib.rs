@@ -12,6 +12,7 @@ pub struct Config{
 pub struct Line<'a>{
     line : Vec<&'a str>,
     index : Vec<usize>,
+    line_num : Vec<u64>,//匹配单词出现在第几行
 }
 
 impl Config{
@@ -30,6 +31,8 @@ impl Config{
 pub fn search<'a>(query : &str, content : & 'a str)->Line<'a>{
     let mut result = Vec::new();
     let mut index : Vec<usize> = Vec::new();
+    let mut line_num : Vec<u64> = Vec::new();
+    let mut cnt : u64 = 1;
     for line in content.lines() {
         if line.contains(&query){
             match line.find(&query){
@@ -37,14 +40,18 @@ pub fn search<'a>(query : &str, content : & 'a str)->Line<'a>{
                 Some(i) => index.push(i),
             }
             result.push(line);
+            line_num.push(cnt);
         }
+        cnt += 1;
     }
-    Line{line : result, index : index}
+    Line{line : result, index : index, line_num : line_num}
 }
 pub fn search_case_insentive<'a>(query : &str, content : & 'a str)->Line<'a>{
     let query = query.to_lowercase();
     let mut result = Vec::new();
     let mut index : Vec<usize> = Vec::new();
+    let mut line_num : Vec<u64> = Vec::new();
+    let mut cnt : u64 = 1;
     for line in content.lines(){
         if line.to_lowercase().contains(&query){
             match line.to_lowercase().find(&query){
@@ -52,11 +59,13 @@ pub fn search_case_insentive<'a>(query : &str, content : & 'a str)->Line<'a>{
                 Some(i) => index.push(i),
             }
             result.push(line);
+            line_num.push(cnt);
         }
+        cnt += 1;
     }
-    Line{line : result , index : index}
+    Line{line : result , index : index, line_num : line_num}
 }
-
+//TODO 每行所有词匹配
 pub fn run(config : Config)->Result<(), Box<dyn Error>>{
     let contents = fs::read_to_string(config.file)?;
     let  lines = if config.case_insenstive{
@@ -72,7 +81,8 @@ pub fn run(config : Config)->Result<(), Box<dyn Error>>{
         let front = &line[..*idx];
         let bold = &line[*idx..(length+*idx)].red().bold();
         let end = &line[(*idx+length)..];
-        println!("{}{}{}", front, bold, end);
+        let header = lines.line_num[index];
+        println!("--{}:{}{}{}", header, front, bold, end);
 }
     Ok(())
 }
