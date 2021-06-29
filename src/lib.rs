@@ -79,7 +79,7 @@ pub fn run(config : Config)->Result<(), Box<dyn Error>>{
         let idx = &lines.index[index];
         let length : usize = config.query.len();
         let front = &line[..*idx];
-        let bold = &line[*idx..(length+*idx)].red().bold();
+        let bold = &line[*idx..(length+*idx)].blue().bold();
         let end = &line[(*idx+length)..];
         let header = lines.line_num[index];
         println!("--{}:{}{}{}", header, front, bold, end);
