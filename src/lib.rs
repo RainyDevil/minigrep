@@ -10,8 +10,8 @@ pub struct Config{
 }
 #[derive(Debug)]
 pub struct Line<'a>{
-    line : Vec<&'a str>,
-    index : Vec<usize>,
+    line : Vec<&'a str>,//出现匹配字符的行
+    index : Vec<usize>,//记录字符第一次出现位置的索引
     line_num : Vec<u64>,//匹配单词出现在第几行
 }
 
